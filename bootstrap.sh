@@ -1,55 +1,60 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-echo "Installing CLI tools..."
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-brew install \
-    fzf \
-    ripgrep \
-    fd \
-    bat \
-    eza
-
-echo "Installing fzf integration..."
-$(brew --prefix)/opt/fzf/install --key-bindings --completion --no-update-rc
-
-echo "Creating ~/.zshrc"
-
-cat > ~/.zshrc <<'EOF'
-
-HISTFILE=~/.zsh_history
-HISTSIZE=5000
-SAVEHIST=5000
-
-setopt HIST_IGNORE_DUPS
-setopt SHARE_HISTORY
-
-autoload -Uz colors && colors
-PROMPT='%n@%m %1~ %# '
-
-autoload -Uz compinit
-compinit
-
-bindkey '^[[A' history-beginning-search-backward
-bindkey '^[[B' history-beginning-search-forward
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-alias ls='eza'
-alias ll='eza -lah'
-alias tree='eza --tree'
-alias grep='rg'
-alias cat='bat'
-
-sshf() {
-    host=$(grep '^Host ' ~/.ssh/config | awk '{print $2}' | fzf)
-    [ -n "$host" ] && ssh "$host"
+need_cmd() {
+  command -v "$1" >/dev/null 2>&1
 }
 
-EOF
+install_with_brew() {
+  echo "Using Homebrew"
+  brew install fzf ripgrep fd bat eza
+}
 
-echo "Bootstrap complete."
+install_with_apt() {
+  echo "Using apt"
+  sudo apt update
+  sudo apt install -y fzf ripgrep fd-find bat
+
+  if apt-cache show eza >/dev/null 2>&1; then
+    sudo apt install -y eza
+  else
+    echo "eza is not available via apt on this system. Skipping eza."
+  fi
+}
+
+setup_fzf() {
+  if need_cmd brew && [[ -x "$(brew --prefix)/opt/fzf/install" ]]; then
+    "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc || true
+  fi
+}
+
+deploy_zshrc() {
+  if [[ -f "$HOME/.zshrc" && ! -f "$HOME/.zshrc.bak" ]]; then
+    cp "$HOME/.zshrc" "$HOME/.zshrc.bak"
+  fi
+
+  cp "$REPO_DIR/zshrc" "$HOME/.zshrc"
+}
+
+main() {
+  if need_cmd brew; then
+    install_with_brew
+  elif need_cmd apt; then
+    install_with_apt
+  else
+    echo "Unsupported package manager. Add support for your distro."
+    exit 1
+  fi
+
+  deploy_zshrc
+  setup_fzf
+
+  echo
+  echo "Done."
+  echo "Reload shell with: source ~/.zshrc"
+}
+
+main "$@"
