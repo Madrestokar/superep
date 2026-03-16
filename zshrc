@@ -15,8 +15,15 @@ bindkey '^[[A' history-beginning-search-backward
 bindkey '^[[B' history-beginning-search-forward
 
 # fzf integration
-if command -v fzf >/dev/null 2>&1; then
-  source <(fzf --zsh 2>/dev/null) || true
+
+if command -v brew >/dev/null 2>&1 && [ -f ~/.fzf.zsh ]; then
+  source ~/.fzf.zsh
+elif [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
+  source /usr/share/doc/fzf/examples/key-bindings.zsh
+fi
+
+if [ -f /usr/share/doc/fzf/examples/completion.zsh ]; then
+  source /usr/share/doc/fzf/examples/completion.zsh
 fi
 
 # Tool compatibility across macOS / Linux
