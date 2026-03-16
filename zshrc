@@ -14,12 +14,12 @@ compinit
 bindkey '^[[A' history-beginning-search-backward
 bindkey '^[[B' history-beginning-search-forward
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# fzf integration
+if command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh 2>/dev/null) || true
+fi
 
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-# Tool name compatibility for Linux/macOS
+# Tool compatibility across macOS / Linux
 if command -v batcat >/dev/null 2>&1; then
   alias cat='batcat'
 elif command -v bat >/dev/null 2>&1; then
@@ -43,13 +43,12 @@ else
   alias ll='ls -lah'
 fi
 
-alias grep='rg'
-
-alias ls='eza'
-alias ll='eza -lah'
-alias tree='eza --tree'
+if command -v rg >/dev/null 2>&1; then
+  alias grep='rg'
+fi
 
 sshf() {
-    host=$(grep '^Host ' ~/.ssh/config | awk '{print $2}' | fzf)
-    [ -n "$host" ] && ssh "$host"
+  local host
+  host=$(grep '^Host ' ~/.ssh/config 2>/dev/null | awk '{print $2}' | fzf)
+  [ -n "$host" ] && ssh "$host"
 }
