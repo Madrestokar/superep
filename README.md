@@ -1,6 +1,6 @@
 CLI Bootstrap
 
-Minimal CLI environment for macOS.
+Minimal CLI environment for macOS and linux.
 
 Installs:
 
