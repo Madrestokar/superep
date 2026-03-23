@@ -13,7 +13,7 @@ Installs:
 Setup:
 
 git clone https://github.com/Madrestokar/bootstrap-linux.git
-cd superep
+cd bootstrap-linux
 ./bootstrap.sh
 
 Notes:
