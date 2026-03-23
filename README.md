@@ -12,7 +12,7 @@ Installs:
 
 Setup:
 
-git clone https://github.com/Madrestokar/superep.git
+git clone https://github.com/Madrestokar/bootstrap-linux.git
 cd superep
 ./bootstrap.sh
 
