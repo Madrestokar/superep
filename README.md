@@ -12,9 +12,7 @@ Installs:
 
 Setup:
 
-git clone https://github.com/Madrestokar/bootstrap-linux.git
-cd bootstrap-linux
-./bootstrap.sh
+git clone https://github.com/Madrestokar/bootstrap-linux.git && cd bootstrap-linux && ./bootstrap.sh
 
 Notes:
 
